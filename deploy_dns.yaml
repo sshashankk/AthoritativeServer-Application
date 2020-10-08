@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dnsdeployment
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dnsdeployment
+  template:
+    metadata:
+      labels:
+        app: dnsdeployment
+    spec:
+      containers:
+      - name: us
+        image: shashanklochan/us:latest
+      - name: as
+        image: shashanklochan/as:latest
+      - name: fs
+        image: shashanklochan/fs:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dnsservice
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    app: dnsdeployment
+  ports:
+  - port: 8080
+    name: us
+    targetPort: 8080
+    nodePort: 30003
+    protocol: TCP
+  - port: 9090
+    name: fs
+    targetPort: 9090
+    nodePort: 30002
+    protocol: TCP
+  - port: 53533
+    name: as
+    targetPort: 53533
+    nodePort: 30001
+    protocol: UDP
